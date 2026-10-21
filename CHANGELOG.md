@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.2
+
+- Project page: <https://mp-it.dk/projects/whisper-captions> (`homepage` in
+  crate metadata), license / MSRV badges and author section in the README
+
 ## 0.1.1
 
 - Drop whisper special tokens (`[_BEG_]`, `[_TT_150]`, `<|endoftext|>`, …) when

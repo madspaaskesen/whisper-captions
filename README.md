@@ -3,6 +3,10 @@
 [![crates.io](https://img.shields.io/crates/v/whisper-captions.svg)](https://crates.io/crates/whisper-captions)
 [![docs.rs](https://docs.rs/whisper-captions/badge.svg)](https://docs.rs/whisper-captions)
 [![CI](https://github.com/madspaaskesen/whisper-captions/actions/workflows/ci.yml/badge.svg)](https://github.com/madspaaskesen/whisper-captions/actions/workflows/ci.yml)
+[![license](https://img.shields.io/crates/l/whisper-captions.svg)](#license)
+[![MSRV](https://img.shields.io/badge/MSRV-1.70-blue.svg)](https://blog.rust-lang.org/)
+
+**[Docs](https://docs.rs/whisper-captions) · [Project page](https://mp-it.dk/projects/whisper-captions) · [Changelog](CHANGELOG.md)**
 
 Turn [whisper.cpp](https://github.com/ggml-org/whisper.cpp) output into
 **caption-ready segments with whole-word timestamps** — and SRT/VTT files.
@@ -91,6 +95,13 @@ in camelCase, ready to hand to a frontend:
 
 Extracted from [Flixlar](https://flixlar.com), a local caption editor, where
 it turns whisper.cpp auto-captions into editable subtitle tracks.
+
+## Author
+
+Built and maintained by [Mads Paaskesen](https://mp-it.dk/projects/whisper-captions),
+Hardcore Websmith at [MP-IT](https://mp-it.dk). Need speech-to-text, a captioning
+pipeline or Whisper / FFmpeg / Rust tooling in your product? I take on freelance
+work: [get in touch](https://mp-it.dk/contact).
 
 ## License
 

@@ -1,12 +1,13 @@
 [package]
 name = "whisper-captions"
-version = "0.1.1"
+version = "0.1.2"
 edition = "2021"
 rust-version = "1.70"
 description = "Turn whisper.cpp output (JSON or stdout) into caption-ready segments with whole-word timestamps, plus SRT/VTT export."
 license = "MIT"
 authors = ["Mads Barclay Paaskesen"]
 repository = "https://github.com/madspaaskesen/whisper-captions"
+homepage = "https://mp-it.dk/projects/whisper-captions"
 documentation = "https://docs.rs/whisper-captions"
 readme = "README.md"
 keywords = ["whisper", "captions", "subtitles", "transcription", "srt"]
