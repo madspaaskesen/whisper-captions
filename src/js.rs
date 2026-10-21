@@ -1,5 +1,6 @@
-//! Small helpers that reproduce JavaScript semantics, so the Rust port gives
-//! byte-identical output to the original JS implementation.
+//! Helpers that follow JavaScript semantics (`Math.round`, `\s`, truthiness,
+//! `String()`). The crate started as a port of a JS implementation and keeps
+//! its output byte-identical.
 
 use serde_json::Value;
 
@@ -8,15 +9,23 @@ use serde_json::Value;
 pub fn is_js_space(c: char) -> bool {
     matches!(
         c,
-        '\t' | '\n' | '\u{0B}' | '\u{0C}' | '\r' | ' ' | '\u{A0}' | '\u{1680}'
-            | '\u{2000}'..='\u{200A}'
-            | '\u{2028}' | '\u{2029}' | '\u{202F}' | '\u{205F}' | '\u{3000}' | '\u{FEFF}'
+        '\t' | '\n' | '\u{0B}' | '\u{0C}' | '\r' | ' ' | '\u{A0}' | '\u{1680}' | '\u{2000}'
+            ..='\u{200A}'
+                | '\u{2028}'
+                | '\u{2029}'
+                | '\u{202F}'
+                | '\u{205F}'
+                | '\u{3000}'
+                | '\u{FEFF}'
     )
 }
 
 /// `String(text).replace(/\s+/g, " ").trim()`
 pub fn sanitize(text: &str) -> String {
-    text.split(is_js_space).filter(|part| !part.is_empty()).collect::<Vec<_>>().join(" ")
+    text.split(is_js_space)
+        .filter(|part| !part.is_empty())
+        .collect::<Vec<_>>()
+        .join(" ")
 }
 
 /// `text.replace(/^\s+/, "")`
@@ -61,7 +70,13 @@ pub fn js_string(value: &Value) -> String {
         // Array.prototype.join: null/undefined elements become "".
         Value::Array(items) => items
             .iter()
-            .map(|v| if v.is_null() { String::new() } else { js_string(v) })
+            .map(|v| {
+                if v.is_null() {
+                    String::new()
+                } else {
+                    js_string(v)
+                }
+            })
             .collect::<Vec<_>>()
             .join(","),
         Value::Object(_) => "[object Object]".to_string(),

@@ -1,12 +1,19 @@
 [package]
 name = "whisper-captions"
-version = "0.1.0"
-description = "Turn whisper.cpp output (JSON or stdout) into clean, caption-ready segments with whole-word timestamps."
-edition.workspace = true
-license.workspace = true
-authors.workspace = true
+version = "0.1.1"
+edition = "2021"
+rust-version = "1.70"
+description = "Turn whisper.cpp output (JSON or stdout) into caption-ready segments with whole-word timestamps, plus SRT/VTT export."
+license = "MIT"
+authors = ["Mads Barclay Paaskesen"]
+repository = "https://github.com/madspaaskesen/whisper-captions"
+documentation = "https://docs.rs/whisper-captions"
+readme = "README.md"
+keywords = ["whisper", "captions", "subtitles", "transcription", "srt"]
+categories = ["multimedia::audio", "parser-implementations", "text-processing"]
+exclude = ["/.github", "/tests/fixtures/*.wav"]
 
 [dependencies]
-regex = "1"
+regex = { version = "1", default-features = false, features = ["std", "perf"] }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"

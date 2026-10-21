@@ -58,8 +58,19 @@ fn whisper_cpp_full_json_merges_bpe_tokens() {
     let s = &segments[0];
     assert_eq!((s.start_ms, s.end_ms, s.duration_ms), (0, 2560, 2560));
     assert_eq!(s.text, "Hello Muldoon, friend.");
-    let words: Vec<_> = s.words.iter().map(|w| (w.text.as_str(), w.start_ms, w.end_ms)).collect();
-    assert_eq!(words, [("Hello", 0, 400), ("Muldoon,", 400, 1200), ("friend.", 1200, 2100)]);
+    let words: Vec<_> = s
+        .words
+        .iter()
+        .map(|w| (w.text.as_str(), w.start_ms, w.end_ms))
+        .collect();
+    assert_eq!(
+        words,
+        [
+            ("Hello", 0, 400),
+            ("Muldoon,", 400, 1200),
+            ("friend.", 1200, 2100)
+        ]
+    );
 }
 
 #[test]
@@ -77,10 +88,22 @@ fn segment_time_falls_back_to_words_and_text_to_word_join() {
 #[test]
 fn transcript_prefers_json_then_stdout() {
     let stdout = "[00:00:00.000 --> 00:00:01.000] from stdout";
-    assert_eq!(texts(&parse_transcript(Some(&json!(null)), Some(stdout))), ["from stdout"]);
-    assert_eq!(texts(&parse_transcript(Some(&json!({ "segments": [] })), Some(stdout))), ["from stdout"]);
+    assert_eq!(
+        texts(&parse_transcript(Some(&json!(null)), Some(stdout))),
+        ["from stdout"]
+    );
+    assert_eq!(
+        texts(&parse_transcript(
+            Some(&json!({ "segments": [] })),
+            Some(stdout)
+        )),
+        ["from stdout"]
+    );
     let json = json!({ "segments": [{ "start": 0, "end": 1, "text": "from json" }] });
-    assert_eq!(texts(&parse_transcript(Some(&json), Some(stdout))), ["from json"]);
+    assert_eq!(
+        texts(&parse_transcript(Some(&json), Some(stdout))),
+        ["from json"]
+    );
 }
 
 #[test]
@@ -90,4 +113,50 @@ fn serializes_like_the_js_objects() {
         serde_json::to_string(&segments).unwrap(),
         r#"[{"startMs":0,"endMs":1000,"durationMs":1000,"text":"hi"}]"#
     );
+}
+
+#[test]
+fn special_tokens_are_dropped() {
+    let json = json!({ "transcription": [{
+        "offsets": { "from": 0, "to": 1000 },
+        "text": " Hi there",
+        "tokens": [
+            { "text": "[_BEG_]", "offsets": { "from": 0, "to": 10 } },
+            { "text": " Hi", "offsets": { "from": 0, "to": 400 } },
+            { "text": "[_TT_20]", "offsets": { "from": 400, "to": 420 } },
+            { "text": " there", "offsets": { "from": 420, "to": 900 } },
+            { "text": "<|endoftext|>", "offsets": { "from": 900, "to": 1000 } }
+        ]
+    }]});
+    let words: Vec<_> = parse_whisper_json(&json)[0]
+        .words
+        .iter()
+        .map(|w| w.text.clone())
+        .collect();
+    assert_eq!(words, ["Hi", "there"]);
+    assert!(is_special_token(" [_TT_150]"));
+    assert!(!is_special_token("[laughs]"));
+}
+
+#[test]
+fn srt_and_vtt() {
+    let segments = parse_whisper_stdout(
+        "[00:00:01.000 --> 00:00:02.500] One\n[01:02:03.004 --> 01:02:04.000] Two\n",
+    );
+    assert_eq!(
+        to_srt(&segments),
+        "1\n00:00:01,000 --> 00:00:02,500\nOne\n\n2\n01:02:03,004 --> 01:02:04,000\nTwo\n"
+    );
+    assert_eq!(
+        to_vtt(&segments),
+        "WEBVTT\n\n00:00:01.000 --> 00:00:02.500\nOne\n\n01:02:03.004 --> 01:02:04.000\nTwo\n"
+    );
+}
+
+#[test]
+fn segments_roundtrip_through_serde() {
+    let segments = parse_whisper_stdout("[00:00:00.000 --> 00:00:01.000] hi");
+    let back: Vec<Segment> =
+        serde_json::from_str(&serde_json::to_string(&segments).unwrap()).unwrap();
+    assert_eq!(back, segments);
 }
